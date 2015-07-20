@@ -1,0 +1,175 @@
+/*------------------------------------*\
+    $Class&Placeholders Helpers
+\*------------------------------------*/
+
+
+/**
+* Z-index Ebenen || z-index: map-get($zindex, header);
+*/
+
+
+$zindex: (
+    modal: 9000,
+    overlay: 8000,
+    dropdown: 7000,
+    header: 6000,
+    footer:5000
+);
+
+
+%hide-text {
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+%hide-text2 {
+    text-indent: -9999px;
+}
+
+.hide-text {
+    @extend %hide-text;
+}
+
+%hide-palm {
+    @include media('<=small') {
+        display: none;
+    }
+}
+
+.hide-palm {
+    @extend %hide-palm;
+}
+
+.hidden {
+  display: none;
+}
+
+
+/**
+* $Text
+*/
+
+
+%text-center,
+.text-center {
+    text-align: center;
+}
+
+
+%text-left {
+    text-align: left;
+}
+.text-left {
+    @extend %text-left;
+}
+
+%text-right {
+    text-align: right;
+}
+.text-right {
+    @extend %text-right;
+}
+
+%text--uppercase {
+    text-transform: uppercase;
+}
+
+.text--uppercase {
+    @extend %text--uppercase;
+}
+
+
+/**
+* $Ausrichtung
+*/
+
+%vertical-align {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+
+.center-vertical {
+    @include vertical-align;
+}
+
+%alignright {
+    float: right;
+}
+
+%alignright-img {
+    float: right;
+    margin-left: 15px;
+}
+
+.alignright {
+    @extend %alignright;
+}
+
+.alignright-img {
+    @extend %alignright-img;
+}
+
+%alignleft {
+    float: left;
+}
+
+%alignleft-img {
+    float: left;
+    margin-right: 15px;
+}
+
+.alignleft {
+    @extend %alignleft;
+}
+
+img.alignleft {
+    margin-right: 15px;
+}
+
+%clearfix {
+    &:after {
+        content: '';
+        display:table;
+        clear: both;
+    }
+}
+
+.clearfix {
+    @extend %clearfix;
+}
+
+/**
+ * $Darstellung
+ */
+
+
+%inline-block {
+    display: inline-block;
+}
+
+.inline-block {
+    @extend %inline-block;
+}
+
+/**
+* $Hintergrundbilder
+*/
+
+
+%bgimg-contain {
+    background-size: contain;
+}
+.bgimg-contain {
+    @extend %bgimg-contain;
+}
+
+%bgimg-cover {
+    background-size: cover;
+}
+
+.bgimg-cover {
+    @extend %bgimg-cover;
+}

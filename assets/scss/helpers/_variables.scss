@@ -1,0 +1,57 @@
+/*------------------------------------*\
+    $Variables
+\*------------------------------------*/
+
+
+/**
+* $COLORS
+* Type: Map
+* Uses function color
+* Example:
+* .foo {
+*   background-color: color(colorname, colortint);
+*   background-color: color('gray', light);
+* }
+* Based on http://erskinedesign.com/blog/friendlier-colour-names-sass-maps/
+*/
+
+
+$_color_white: #fff;
+$_color_grey: #333;
+$_color_black: #000;
+
+
+
+// COLORMAP
+
+
+$colors: (
+  'white': (
+    base: $_color_white,
+    dark: darken($_color_white, 10%),
+  ),
+  'gray': (
+    x_light:    rgb(237, 237, 237),
+    light:      rgb(227, 227, 227),
+    base:       $_color_white,
+    medium:     rgb(157, 157, 157),
+    dark:       rgb(167, 167, 167),
+    x_dark:     rgb(56, 56, 56),
+    xx_dark:    rgb(34, 34, 34)
+  ),
+);
+
+//
+// z-index map 
+//
+
+$zindexes: (
+  'modal': 9999,
+  'fixedHeader': 8000,
+  'slider': 100,
+  'sliderThumbs': 50,
+  'sliderInner': 25,
+  'base': 1,
+  'below': -1
+);
+

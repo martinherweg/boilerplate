@@ -1,0 +1,117 @@
+/*------------------------------------*\
+    $Typography Rules
+\*------------------------------------*/
+
+
+$font-size__base: 16;
+$font-size__body: $font-size__base +px;
+$font-main: Arial, sans-serif;
+
+
+$headings__weight: 700;
+
+$font-size__h1: 45;
+$font-size__h2: 40;
+$font-size__h3: 25;
+$font-size__h4: 15;
+$font-size__h5: 24;
+$font-size__h6: 22;
+
+
+html {
+  font-size: 100%;
+}
+
+body {
+  font-family: $font-main;
+  font-size: $font-size__base +px;
+  line-height: 1.5;
+  color: color('gray', x_dark);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+strong,
+b {
+  font-weight: bold;
+}
+
+//------------------------------------\\
+    // HEADLINES
+//------------------------------------\\
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+    font-weight: $headings__weight;
+    color: inherit;
+    margin-bottom: rem-calc(15);
+    margin-top: 0;
+}
+
+%h1 {
+    font-size:rem-calc($font-size__h1);
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+h1,
+.h1 {
+    @extend %h1;
+}
+
+
+%h2 {
+    font-size:rem-calc($font-size__h2);
+    line-height: 1;
+}
+
+h2,
+.h2 {
+    @extend %h2;
+}
+
+%h3 {
+    font-size:rem-calc($font-size__h3);
+    line-height: 1;
+}
+
+
+h3,
+.h3 {
+    @extend %h3;
+}
+
+%h4 {
+    font-size:rem-calc($font-size__h4);
+    line-height: 1;
+}
+
+h4,
+.h4 {
+    @extend %h4;
+}
+
+
+%h5 {
+    font-size:rem-calc($font-size__h5);
+    line-height: 1;
+}
+
+
+h5,
+.h5 {
+    @extend %h5;
+}
+
+%h6 {
+    font-size:rem-calc($font-size__h6);
+    line-height: 1;
+}
+
+
+h6,
+.h6 {
+    @extend %h6;
+}

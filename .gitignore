@@ -1,0 +1,112 @@
+###############################################################################
+##                                                                            #
+##       GIT IGNORE FOR WORDPRESS SITES                                       #
+##       ------------------------------                                       #
+##       By: BigWilliam <hello@bigwilliam.com>                                #
+##       License: MIT - aka you can use/modify this how you want :)           #
+##                                                                            #
+###############################################################################
+
+###############################################################################
+##                                                                            #
+##       NOTE: TO STOP TRACKING A FILE AFTER IGNORING IT,                     #
+##             USE THESE GIT COMMANDS:                                        #
+##                                                                            #
+##             git rm --cached <file>                                         #
+##             git add . # or git add <file>                                  #
+##                                                                            #
+###############################################################################
+
+
+## OS and Utility Stuff ##
+
+#==================#
+#     OS Files     #
+#==================#
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+*[Tt]humbs.db
+*.Trashes
+
+#==================#
+#    Log files     #
+#==================#
+*.log
+error_log
+access_log
+.sass-cache
+
+#===================================#
+#       npm Files             #
+#===================================#
+node_modules
+bower_components
+.grunt
+
+
+#===================================#
+#          sublime files            #
+#===================================#
+*.sublime-project
+*.sublime-workspace
+.sublime-gulp.cache
+Package Syncing.last-run
+
+## Main Stuff ##
+
+#===================================#
+#     Laravel IGNORE                #
+#===================================#
+/bootstrap/compiled.php
+!/vendor/*
+composer.phar
+composer.lock
+.env.*.php
+.env.php
+Thumbs.db
+
+#===================================#
+#     grav IGNORE                   #
+#===================================#
+
+/cache/*
+/logs/*
+/images/*
+
+#===================================#
+#     Theme IGNORE                  #
+#===================================#
+dist
+concat
+svg-opt
+
+!.gitignore
+!favicon.ico
+!favicon.png
+!robots.txt
+!humans.txt
+
+!assets
+!frontend
+!*.html
+!*.php
+!gulpfile.js
+!package.json
+
+
+#===================================#
+#     PROJECT SPECIFIC STUFF        #
+#===================================#
+
+README.html
+CodeKit-project_icon.png
+
+
+## Depreciated stuff, keeping here for reference ##
+
+##### design files #####
+*.psd

@@ -1,0 +1,48 @@
+//------------------------------------\\
+    // $Listen
+//------------------------------------\\
+
+%list-no-style {
+    list-style: none;
+}
+
+.list-no-style {
+    @extend %list-no-style;
+}
+
+%list-no-padding {
+    padding: 0;
+    margin: 0;
+
+    li {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.list-no-padding {
+    @extend %list-no-padding;
+}
+
+%list-horizontal {
+    li {
+        display: inline-block;
+    }
+}
+
+.list-horiz {
+    @extend %clearfix;
+    @extend %list-horizontal;
+}
+
+%gap {
+    padding: $gutter/2 0;
+}
+
+.empty {
+    height: $gutter/2;
+}
+
+%standart-padding {
+    padding: $gutter 0;
+}
