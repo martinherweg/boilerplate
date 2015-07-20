@@ -18,6 +18,7 @@
 
 var pkg          = require('./package.json');
 var vhost        = 'website.dev';
+var rootLocation = 'assets';
 var destLocation = 'dist';
 
 /*------------------------------------*\
@@ -107,7 +108,7 @@ var browserSyncConfig = {
 
 
 gulp.task('sass', function() {
-  return gulp.src(['assets/scss/style.scss'])
+  return gulp.src([rootLocation + '/scss/style.scss'])
     .pipe($.sourcemaps.init())
     .pipe($.sass.sync({
       outputStyle: 'nested',
@@ -128,12 +129,12 @@ gulp.task('sass', function() {
 });
 
 gulp.task('sass-compressed', function() {
-  return gulp.src(['assets/scss/style.scss'])
+  return gulp.src([rootLocation + '/scss/style.scss'])
     .pipe($.plumber({error_handler: on_Error}))
     .pipe($.sass({
       outputStyle: 'compressed',
       includePaths: [
-        'assets/scss/**/*.scss'
+        rootLocation + '/scss/**/*.scss'
       ],
     }))
     .pipe($.autoprefixer({browsers: autoprefixer_browsers}))
@@ -143,14 +144,14 @@ gulp.task('sass-compressed', function() {
 });
 
 gulp.task('combine-mq', function() {
-  return gulp.src(['dist/css/**/*.css'])
+  return gulp.src([destLocation + '/css/**/*.css'])
     .pipe($.combineMediaQueries({
       log: true
     }))
     .pipe($.debug({verbose: true}))
     .pipe($.minifyCss())
     .pipe($.size({title: 'styles'}))
-    .pipe(gulp.dest('dist/css/'))
+    .pipe(gulp.dest(destLocation + '/css/'))
 });
 
 gulp.task('sass-prod', function(cb) {
@@ -166,14 +167,24 @@ gulp.task('sass-prod', function(cb) {
   $JS tasks
 \*------------------------------------*/
 
+gulp.task('modernizr', function() {
+  gulp.src([destLocation + '/css/**/*.css', destLocation + '/js/**/*.js'])
+    .pipe($.modernizr({
+      excludeTests: ['hidden'],
+      tests: ['flexbox', 'flexboxlegacy'],
+      options: ['setClasses']
+    }))
+    .pipe(gulp.dest(rootLocation + '/js/libs/'))
+});
+
 gulp.task('copy-bower-components', function() {
   return gulp.src(bowerComponents)
-  .pipe($.newer('assets/js/libs/**/.js'))
-  .pipe(gulp.dest('assets/js/libs/'));
+  .pipe($.newer(rootLocation + '/js/libs/**/.js'))
+  .pipe(gulp.dest(rootLocation + '/js/libs/'));
 });
 
 gulp.task('js-plugins', function() {
-  return gulp.src('assets/js/libs/**/*.js')
+  return gulp.src(rootLocation + '/js/libs/**/*.js')
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.sourcemaps.init())
   .pipe($.order([
@@ -181,22 +192,22 @@ gulp.task('js-plugins', function() {
   .pipe($.debug({verbose: true}))
   .pipe($.concat('concat/plugins.js'))
   .pipe($.sourcemaps.write('.'))
-  .pipe(gulp.dest('assets/js/'));
+  .pipe(gulp.dest(rootLocation + '/js/'));
 });
 
 gulp.task('js-sources', function() {
-  return gulp.src('assets/js/my-source/**/*.js')
+  return gulp.src(rootLocation + '/js/my-source/**/*.js')
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.jshint())
   .pipe($.jshint.reporter('jshint-stylish'))
   .pipe($.sourcemaps.init())
   .pipe($.concat('concat/sources.js'))
   .pipe($.sourcemaps.write('.'))
-  .pipe(gulp.dest('assets/js/'));
+  .pipe(gulp.dest(rootLocation + '/js/'));
 });
 
 gulp.task('js-concat', function() {
-  return gulp.src('assets/js/concat/**/*.js')
+  return gulp.src(rootLocation + '/js/concat/**/*.js')
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.sourcemaps.init({ loadMaps: true }))
   .pipe($.concat('scripts.min.js'))
@@ -208,7 +219,7 @@ gulp.task('js-concat', function() {
 });
 
 gulp.task('js', function(cb) {
-  runSequence('copy-bower-components', 'clean:concat', 'js-plugins', 'js-sources',  'js-concat', cb);
+  runSequence('clean:libs','copy-bower-components', 'clean:concat', 'js-plugins', 'js-sources',  'js-concat', cb);
 });
 
 
@@ -221,7 +232,7 @@ gulp.task('js', function(cb) {
 \*------------------------------------*/
 
 gulp.task('svg-single', function() {
-  return gulp.src('assets/img/svg/single/**/*')
+  return gulp.src(rootLocation + '/img/svg/single/**/*')
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.changed(destLocation + '/img/svg/single/'))
   .pipe($.size({ title: 'svgs before' }))
@@ -236,7 +247,7 @@ gulp.task('svg-single', function() {
 });
 
 gulp.task('svg-sprite', function() {
-  return gulp.src('assets/img/svg/sprite/**/*')
+  return gulp.src(rootLocation + '/img/svg/sprite/**/*')
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.changed(destLocation + '/img/svg/single/'))
   .pipe($.size({ title: 'svg sprite before' }))
@@ -269,7 +280,7 @@ gulp.task('svg-sprite', function() {
 \*------------------------------------*/
 
 gulp.task('images', function() {
-  return gulp.src(['assets/img/**/*', '!assets/img/svg/**/*'])
+  return gulp.src([rootLocation + '/img/**/*', '!' + rootLocation '/img/svg/**/*'])
   .pipe($.plumber({error_handler: on_Error}))
   .pipe($.changed(destLocation + '/img/'))
   .pipe($.size({ title: 'images before' }))
@@ -330,7 +341,7 @@ gulp.task('bump-major', function() {
 
 gulp.task('clean:dist', function(cb) {
   del([
-    destLocation + '/**'
+    destLocation + '/**/*'
   ],{
       force:true
     }, cb);
@@ -338,10 +349,18 @@ gulp.task('clean:dist', function(cb) {
 
 gulp.task('clean:concat', function(cb) {
   del([
-    'assets/js/concat/**/'
+    rootLocation + '/js/concat/**/*'
   ],{
       force:true
     }, cb);
+});
+
+gulp.task('clean:libs', function(cb) {
+  del([
+    rootLocation + '/js/libs/**/*'
+  ], {
+    force: true
+  }, cb);
 });
 
 
@@ -353,19 +372,19 @@ gulp.task('clean:concat', function(cb) {
 
 
   gulp.task('build', function(cb) {
-    runSequence('clean:dist', 'sass', 'js', 'images', 'svg-single', 'svg-sprite', cb);
+    runSequence('clean:dist', 'sass', 'modernizr', 'js', 'images', 'svg-single', 'svg-sprite', 'fonts', cb);
   });
 
   gulp.task('publish', function(cb) {
-    runSequence('clean:dist', 'bump', 'sass-prod', 'js', 'images', 'svg-single', 'svg-sprite', cb);
+    runSequence('clean:dist', 'bump', 'sass-prod', 'js', 'modernizr', 'js-prod', 'images', 'svg-single', 'svg-sprite', cb);
   });
 
   gulp.task('watch', ['browser-sync'], function() {
-    gulp.watch('assets/scss/**/*.scss', ['sass']);
-    gulp.watch('assets/js/**/*.js', ['js', ['bs-reload']]);
+    gulp.watch(rootLocation + '/scss/**/*.scss', ['sass']);
+    gulp.watch(rootLocation + '/js/**/*.js', ['js', ['bs-reload']]);
     gulp.watch('**/*.html', ['bs-reload']);
     gulp.watch('**/*.php', ['bs-reload']);
-    gulp.watch(['assets/img/cssimg/**/*', 'assets/img/htmlimg/**/*'], ['images']);
-    gulp.watch('assets/img/svg/single/**/*', ['svg-single']);
-    gulp.watch('assets/img/svg/sprite/**/*', ['svg-sprite']);
+    gulp.watch([rootLocation + '/img/cssimg/**/*',  rootLocation + '/img/htmlimg/**/*'], ['images']);
+    gulp.watch(rootLocation + '/img/svg/single/**/*', ['svg-single']);
+    gulp.watch(rootLocation + '/img/svg/sprite/**/*', ['svg-sprite']);
   });
