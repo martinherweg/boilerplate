@@ -43,7 +43,7 @@ var src = 'src/',
     srcSvgSprite = srcSvg + 'sprite/';
 
 if (themeName) {
-  var dist = 'dist/wp-content/themes' + themeName;
+  var dist = 'dist/wp-content/themes/' + themeName + '/';
 } else {
   var dist = 'dist/';
 }
@@ -77,6 +77,12 @@ var jsSources = {
   ]
 };
 
+
+// modernizr tests
+var modernizrTests = [
+  'flexbox',
+  'flexboxlegacy'
+]
 
 /*------------------------------------*\
   #init modules
@@ -190,6 +196,25 @@ gulp.task('sass', function() {
   #JS tasks
 \*------------------------------------*/
 
+
+// modernizr task
+
+gulp.task('js-modernizr', function() {
+  gulp.src([srcCss + '**/*.scss', srcJs + '**/*.js'])
+  .pipe($.modernizr({
+    crawl: true,
+    excludeTests: ['hidden'],
+    options: [
+      'setClasses',
+      'addTest'
+    ],
+    tests: modernizrTests
+  }))
+  .pipe($.uglify())
+  .pipe($.rename({ suffix: '-custom.min' }))
+  .pipe(gulp.dest(distJs + 'vendor/'));
+});
+
 // combine bower components and other Plugins
 gulp.task('js-plugins', function() {
   gulp.src(jsSources.combinejs)
@@ -244,17 +269,13 @@ gulp.task('js-scripts', function() {
   #JS tasks
 \*------------------------------------*/
 
-// gulp.task('init', [
-//   'templates',
-//   'sass',
-//   'js-plugins',
-//   'js-move',
-//   'js-scripts'
-// ]);
+
+// init tasks
 
 gulp.task('init', function() {
   runSequence(
     'templates',
+    'js-modernizr',
     'sass',
     'js-plugins',
     'js-move',
@@ -262,17 +283,24 @@ gulp.task('init', function() {
 );
 });
 
+//watch task
+
 gulp.task('watch', function() {
 
   // watch template files
-  gulp.watch(srcTemplates + '**/*.{php, html}', ['templates', 'bs-reload']);
+  gulp.watch(srcTemplates + '**/*.php', ['templates']);
 
   // watch scss files
   gulp.watch(srcCss + '**/*.scss', ['sass']);
 
   // watch JS Task
-  gulp.watch(srcJsMySource + '**/*.js', ['js-scripts', 'bs-reload']);
-  gulp.watch(srcJs + 'single/**/*', ['js-move', 'bs-reload']);
+  gulp.watch(srcJsMySource + '**/*.js', ['js-scripts']);
+  gulp.watch(srcJs + 'single/**/*', ['js-move']);
+
+ // reload task
+  gulp.watch(dist + '**/*.{php, html, js, jpg, png, svg}', ['bs-reload']);
 });
+
+// default task
 
 gulp.task('default', ['browser-sync', 'watch']);
