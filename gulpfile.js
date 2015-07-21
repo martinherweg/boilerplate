@@ -35,7 +35,7 @@ var src = 'src/',
     srcJs = srcAssets + 'js/',
     srcJsMySource = srcJs + 'my-source/',
     srcJsJson = srcJs + 'json/',
-    srcImages = srcAssets = 'images/',
+    srcImages = srcAssets + 'images/',
     srcHtmlImages = srcImages + 'htmlimages/',
     srcCssImages = srcImages + 'cssimages/',
     srcSvg = srcImages + 'svg/',
@@ -98,7 +98,7 @@ runSequence = require('run-sequence'),
 reload      = browserSync.reload;
 
 
-var on_Error = function(err) {
+var errorLog = function(err) {
   $.util.beep();
   console.log(err);
   if (this.emit) {
@@ -218,7 +218,6 @@ gulp.task('js-modernizr', function() {
 // combine bower components and other Plugins
 gulp.task('js-plugins', function() {
   gulp.src(jsSources.combinejs)
-  .pipe($.plumber())
   .pipe($.debug({
     verbose: true
   }))
@@ -248,9 +247,6 @@ gulp.task('js-move', function() {
 // combine my own scripts
 gulp.task('js-scripts', function() {
   gulp.src(srcJsMySource + '**/*.js')
-  .pipe($.plumber({
-    error_handler: on_Error
-  }))
   .pipe($.jshint())
   .pipe($.jshint.reporter('jshint-stylish'))
   .pipe($.sourcemaps.init())
@@ -266,9 +262,52 @@ gulp.task('js-scripts', function() {
 
 
 /*------------------------------------*\
-  #JS tasks
+  /#JS tasks
 \*------------------------------------*/
 
+
+/*------------------------------------*\
+  #images
+\*------------------------------------*/
+
+gulp.task('images', function() {
+  gulp.src([srcImages + '**/*.{jpg,png}'])
+  .pipe($.debug({verbose: true}))
+  .pipe($.changed(distImages))
+  .pipe($.size({
+    title: 'images before'
+  }))
+  .pipe($.imagemin({
+    progressive: true,
+    interlaces: true
+  }))
+  .pipe(gulp.dest(distImages))
+  .pipe($.debug({verbose: true}))
+  .pipe($.size({
+    title: 'images after'
+  }));
+});
+
+/*------------------------------------*\
+  /#images
+\*------------------------------------*/
+
+
+/*------------------------------------*\
+  #clean
+\*------------------------------------*/
+
+gulp.task('clean:dist', function(cb) {
+  del([
+    dist + '**/*'
+  ], {
+    force: true
+  }, cb);
+});
+
+/*------------------------------------*\
+  /#clean
+\*------------------------------------*/
 
 // init tasks
 
