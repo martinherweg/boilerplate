@@ -8,6 +8,8 @@
     5. #templates
     6. #sass
     7. #js
+    8. #images
+    9. #svg
 \*------------------------------------*/
 
 // Config
@@ -36,8 +38,6 @@ var src = 'src/',
     srcJsMySource = srcJs + 'my-source/',
     srcJsJson = srcJs + 'json/',
     srcImages = srcAssets + 'images/',
-    srcHtmlImages = srcImages + 'htmlimages/',
-    srcCssImages = srcImages + 'cssimages/',
     srcSvg = srcImages + 'svg/',
     srcSvgSingle = srcSvg + 'single/',
     srcSvgSprite = srcSvg + 'sprite/';
@@ -95,7 +95,8 @@ var $       = require('gulp-load-plugins')(),
 browserSync = require('browser-sync'),
 del         = require('del'),
 runSequence = require('run-sequence'),
-reload      = browserSync.reload;
+reload      = browserSync.reload,
+argv        = require('yargs').argv;
 
 
 var errorLog = function(err) {
@@ -152,9 +153,9 @@ gulp.task('templates', function() {
   .pipe($.changed(dist, {
     extension: '.php'
   }))
-  .pipe($.debug({verbose: true}))
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
   .pipe(gulp.dest(dist))
-  .pipe($.debug({verbose: true}));
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
 });
 
 /*------------------------------------*\
@@ -165,7 +166,7 @@ gulp.task('templates', function() {
 gulp.task('sass', function() {
   gulp.src(srcCss + 'style.scss')
   .pipe($.plumber())
-  .pipe($.debug({verbose: true}))
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
   .pipe($.sass.sync({
     outputStyle: 'compressed',
     precision: 10,
@@ -218,9 +219,7 @@ gulp.task('js-modernizr', function() {
 // combine bower components and other Plugins
 gulp.task('js-plugins', function() {
   gulp.src(jsSources.combinejs)
-  .pipe($.debug({
-    verbose: true
-  }))
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
   .pipe($.concat('plugins.js'))
   // .pipe($.uglify())
   .pipe(gulp.dest(distJs))
@@ -234,7 +233,7 @@ gulp.task('js-plugins', function() {
 gulp.task('js-move', function() {
   jsSources.copyjs.forEach(function(item) {
     gulp.src(item.src)
-    .pipe($.debug({verbose: true}))
+    .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
     .pipe($.uglify())
     .pipe(gulp.dest(distJs))
     .pipe($.size({
@@ -272,7 +271,7 @@ gulp.task('js-scripts', function() {
 
 gulp.task('images', function() {
   gulp.src([srcImages + '**/*.{jpg,png}'])
-  .pipe($.debug({verbose: true}))
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
   .pipe($.changed(distImages))
   .pipe($.size({
     title: 'images before'
@@ -282,7 +281,7 @@ gulp.task('images', function() {
     interlaces: true
   }))
   .pipe(gulp.dest(distImages))
-  .pipe($.debug({verbose: true}))
+  .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
   .pipe($.size({
     title: 'images after'
   }));
@@ -291,6 +290,65 @@ gulp.task('images', function() {
 /*------------------------------------*\
   /#images
 \*------------------------------------*/
+
+
+
+/*------------------------------------*\
+  #svg
+\*------------------------------------*/
+
+gulp.task('svg-single', function() {
+  gulp.src(srcSvgSingle + '**/*.svg')
+    .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
+    .pipe($.changed(distSvgSingle))
+    .pipe($.size({
+      title: 'Single SVG Images before'
+    }))
+    .pipe($.imagemin({
+      svgoPlugins: [{
+        removeViewBox: false
+      }]
+    }))
+    .on('error', errorLog)
+    .pipe(gulp.dest(distSvgSingle))
+    .pipe($.size({
+      title: 'single SVG Images after'
+    }));
+});
+
+gulp.task('svg-sprite', function() {
+  gulp.src(srcSvgSprite + '**/*.svg')
+    .pipe( argv.source ? $.debug({ verbose: true }) : $.util.noop() )
+    .pipe($.changed(distSvgSprite))
+    .pipe($.size({
+      title: 'Sprite SVG Images before'
+    }))
+    .pipe($.imagemin({
+      svgoPlugins: [{
+        removeViewBox: false
+      }]
+    }))
+    .on('error', errorLog)
+    .pipe($.svgSprite({
+      mode: {
+        symbol: {
+          dest: 'sprite',
+          sprite: 'svgsprite.svg',
+          inline: true
+        }
+      }
+    }))
+    .on('error', errorLog)
+    .pipe(gulp.dest(distSvg))
+    .pipe($.size({
+      title: 'Sprite SVG Images after'
+    }));
+});
+
+/*------------------------------------*\
+  /#svg
+\*------------------------------------*/
+
 
 
 /*------------------------------------*\
@@ -318,7 +376,10 @@ gulp.task('init', function() {
     'sass',
     'js-plugins',
     'js-move',
-    'js-scripts'
+    'js-scripts',
+    'images',
+    'svg-single',
+    'svg-sprite'
 );
 });
 
@@ -336,8 +397,15 @@ gulp.task('watch', function() {
   gulp.watch(srcJsMySource + '**/*.js', ['js-scripts']);
   gulp.watch(srcJs + 'single/**/*', ['js-move']);
 
+  // watch images
+  gulp.watch(srcImages + '**/*.{jpg,png}', ['images']);
+
+  // watch SVG
+  gulp.watch(srcSvgSingle + '**/*.svg', ['svg-single']);
+  gulp.watch(srcSvgSprite + '**/*.svg', ['svg-sprite']);
+
  // reload task
-  gulp.watch(dist + '**/*.{php, html, js, jpg, png, svg}', ['bs-reload']);
+  gulp.watch(dist + '**/*.{php,html,js,jpg,png,svg}', ['bs-reload']);
 });
 
 // default task
