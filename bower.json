@@ -15,6 +15,8 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "include-media": "~1.1.2"
+    "include-media": "~1.1.2",
+    "isotope": "~2.2.1",
+    "jquery-validate": "~1.14.0"
   }
 }
