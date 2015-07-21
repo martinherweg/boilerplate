@@ -7,13 +7,14 @@
     4. #browserSync
     5. #templates
     6. #sass
+    7. #js
 \*------------------------------------*/
 
 // Config
 
-var vhost = 'website.dev';
+var vhost = 'martin-boilerplate.dev';
 // define if wordpress
-var themeName = 'lenaKlagesNew/';
+var themeName = '';
 
 
 var autoprefixer_browsers = [
@@ -28,8 +29,8 @@ var autoprefixer_browsers = [
 
 var src = 'src/',
     srcAssets = src + 'assets/';
-    srcBower = src + 'bower_components/',
-    srcTemplates = src + 'templates/'
+    srcBower = 'bower_components/',
+    srcTemplates = srcAssets + 'templates/'
     srcCss = srcAssets + 'scss/',
     srcJs = srcAssets + 'js/',
     srcJsMySource = srcJs + 'my-source/',
@@ -63,9 +64,18 @@ var distAssets = dist + 'assets/',
  srcJs + 'package'
  etc...
 */
-var combineJS = [
-  srcJsMySource + '**/*.{js}'
-];
+var jsSources = {
+  // copy Single JS Files which will not be combined
+  copyjs: [
+    {src: 'src/assets/js/single/**/*'}
+  ],
+
+  // Copy and Combine JS Files (Bower and other Plugins)
+  combinejs: [
+    'bower_components/isotope/dist/isotope.pkgd.js',
+    'bower_components/jquery-validate/dist/jquery.validate.js'
+  ]
+};
 
 
 /*------------------------------------*\
@@ -132,8 +142,13 @@ gulp.task('bs-reload', function() {
 
 
 gulp.task('templates', function() {
-  gulp.src(srcTemplates + '**/*.{php,html}')
-  .pipe(gulp.dest(dist));
+  gulp.src(srcTemplates + '**/*.php')
+  .pipe($.changed(dist, {
+    extension: '.php'
+  }))
+  .pipe($.debug({verbose: true}))
+  .pipe(gulp.dest(dist))
+  .pipe($.debug({verbose: true}));
 });
 
 /*------------------------------------*\
@@ -154,18 +169,110 @@ gulp.task('sass', function() {
   })
   .on('error', $.sass.logError)
   .on('error', $.notify.onError('Sass Compile Error!'))
-)
-.pipe($.autoprefixer({
-  browsers: autoprefixer_browsers
-}))
-.pipe($.sourcemaps.write('.'))
-.pipe(gulp.dest(distCss))
-.pipe($.filter('**/*.css'))
-.pipe($.notify('Compiled <% file.relative %>'))
-.pipe($.size({
-  title: 'styles'
-}))
-.pipe(reload({
-  stream: true
-}))
+  )
+  .pipe($.autoprefixer({
+    browsers: autoprefixer_browsers
+  }))
+  .pipe($.sourcemaps.write('.'))
+  .pipe(gulp.dest(distCss))
+  .pipe($.filter('**/*.css'))
+  .pipe($.notify('Compiled <% file.relative %>'))
+  .pipe($.size({
+    title: 'styles'
+  }))
+  .pipe(reload({
+    stream: true
+  }));
 });
+
+
+/*------------------------------------*\
+  #JS tasks
+\*------------------------------------*/
+
+// combine bower components and other Plugins
+gulp.task('js-plugins', function() {
+  gulp.src(jsSources.combinejs)
+  .pipe($.plumber())
+  .pipe($.debug({
+    verbose: true
+  }))
+  .pipe($.concat('plugins.js'))
+  // .pipe($.uglify())
+  .pipe(gulp.dest(distJs))
+  .pipe($.size({
+    title: 'combined JS Plugins'
+  }))
+  .pipe($.notify('combined JS Plguins'));
+});
+
+// move single js or json Files
+gulp.task('js-move', function() {
+  jsSources.copyjs.forEach(function(item) {
+    gulp.src(item.src)
+    .pipe($.debug({verbose: true}))
+    .pipe($.uglify())
+    .pipe(gulp.dest(distJs))
+    .pipe($.size({
+      title: 'Single JS Files Size:'
+    }))
+    .pipe($.notify('moved Single JS Files'));
+  });
+});
+
+// combine my own scripts
+gulp.task('js-scripts', function() {
+  gulp.src(srcJsMySource + '**/*.js')
+  .pipe($.plumber({
+    error_handler: on_Error
+  }))
+  .pipe($.jshint())
+  .pipe($.jshint.reporter('jshint-stylish'))
+  .pipe($.sourcemaps.init())
+  .pipe($.concat('scripts.min.js'))
+  .pipe($.uglify())
+  .pipe($.sourcemaps.write('.'))
+  .pipe(gulp.dest(distJs))
+  .pipe($.size({
+    title: 'JS'
+  }))
+  .pipe($.notify('compiled JS'));
+});
+
+
+/*------------------------------------*\
+  #JS tasks
+\*------------------------------------*/
+
+// gulp.task('init', [
+//   'templates',
+//   'sass',
+//   'js-plugins',
+//   'js-move',
+//   'js-scripts'
+// ]);
+
+gulp.task('init', function() {
+  runSequence(
+    'templates',
+    'sass',
+    'js-plugins',
+    'js-move',
+    'js-scripts'
+);
+});
+
+gulp.task('watch', function() {
+
+  // watch template files
+  gulp.watch(srcTemplates + '**/*.{php, html}', ['templates', 'bs-reload']);
+
+  // watch scss files
+  gulp.watch(srcCss + '**/*.scss', ['sass']);
+
+  // watch JS Task
+  gulp.watch(srcJsMySource + '**/*.js', ['js-scripts', 'bs-reload']);
+  gulp.watch(srcJs + 'single/**/*', ['js-move', 'bs-reload']);
+});
+
+gulp.task('default', ['browser-sync', 'watch']);
