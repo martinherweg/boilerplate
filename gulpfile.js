@@ -30,7 +30,7 @@ var autoprefixer_browsers = [
 
 
 var src = 'src/',
-    srcAssets = src + 'assets/';
+    srcAssets = src;
     srcBower = 'bower_components/',
     srcTemplates = srcAssets + 'templates/'
     srcCss = srcAssets + 'scss/',
